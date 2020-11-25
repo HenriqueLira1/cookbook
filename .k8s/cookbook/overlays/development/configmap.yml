@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cookbook-configmap
+data:
+  DJANGO_SETTINGS_MODULE: "cookbook.settings.development"
+  KAFKA_BROKERS_URL: |
+    b-2.mimic-kafka-developme.p58c3b.c10.kafka.us-east-1.amazonaws.com:9094,
+    b-3.mimic-kafka-developme.p58c3b.c10.kafka.us-east-1.amazonaws.com:9094,
+    b-1.mimic-kafka-developme.p58c3b.c10.kafka.us-east-1.amazonaws.com:9094

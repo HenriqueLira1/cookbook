@@ -1,0 +1,43 @@
+build:
+  stage: Building
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  only:
+    refs:
+      - develop
+      - master
+  tags:
+    - mimic-runner
+  script:
+    - |
+      readonly BASE_IMAGE="${CI_REGISTRY}/${CI_PROJECT_PATH}"
+      readonly DOCKER_TAG="${BASE_IMAGE}:${CI_BUILD_REF:0:8}"
+
+      if [[ "${CI_BUILD_REF_NAME}" == "develop" ]];then
+        DOCKER_TAG_LATEST="${BASE_IMAGE}:develop"
+      else
+        DOCKER_TAG_LATEST="${BASE_IMAGE}:latest"
+      fi
+
+      {
+        echo "{"
+        echo "  \"auths\": {"
+        echo "      \"$CI_REGISTRY\": {"
+        echo "          \"username\": \"$CI_REGISTRY_USER\","
+        echo "          \"password\": \"$CI_REGISTRY_PASSWORD\""
+        echo "      }"
+        echo "  }"
+        echo "}"
+      } > /kaniko/.docker/config.json
+
+      /kaniko/executor \
+        --context $CI_PROJECT_DIR \
+        --dockerfile $CI_PROJECT_DIR/Dockerfile \
+        --build-arg COMMIT_HASH="${CI_COMMIT_SHA}" \
+        --destination $DOCKER_TAG \
+        --destination $DOCKER_TAG_LATEST \
+        --cache=true \
+        --cache-ttl=120h
+
+      echo "Image: ${DOCKER_TAG} and ${DOCKER_TAG_LATEST}, pushed to GitLab CI Container Registry"

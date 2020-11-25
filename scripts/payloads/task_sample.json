@@ -1,0 +1,28 @@
+{
+    "order_id": 86,
+    "aggregator_id": "7796309",
+    "status": "ACTIVE",
+    "client": {"name": "Rappi SAS", "phone": "+57 031 3163535"},
+    "pos": {"brand": {"name": "Patties"}, "hub": {"slug": "reboucas"}},
+    "pick_up_address": {
+        "street": "Av. Rebouças",
+        "number": "2807",
+        "postal_code": "05401-350",
+        "city": "São Paulo",
+        "federal_unit": "SP",
+        "country": "Brazil",
+        "complement": null,
+        "neighborhood": "Pinheiros"
+    },
+    "drop_off_address": {
+        "street": "Rua Curitiba",
+        "number": "31",
+        "postal_code": "04005-030",
+        "city": "São Paulo",
+        "federal_unit": "SP",
+        "country": "Brazil",
+        "complement": "AP 191",
+        "neighborhood": "Paraíso"
+    },
+    "created_at": "2020-11-09T12:30:00.000000Z"
+}

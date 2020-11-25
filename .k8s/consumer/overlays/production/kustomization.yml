@@ -1,0 +1,5 @@
+bases:
+  - ../../base
+commonLabels:
+  tags.datadoghq.com/env: "production"
+namespace: production

@@ -1,0 +1,35 @@
+.deploy_template: &deploy_template
+  stage: Deploy
+  tags:
+    - mimic-runner
+  script:
+    - bash .gitlab-ci/scripts/deploy.sh
+
+deploy-dev:
+  <<: *deploy_template
+  environment:
+    name: development
+    url: https://cookbook.development.mimic.com.br
+  only:
+    refs:
+      - develop
+
+deploy-staging:
+  <<: *deploy_template
+  environment:
+    name: staging
+    url: https://cookbook.staging.mimic.com.br
+  only:
+    refs:
+      - master
+
+deploy-production:
+  <<: *deploy_template
+  when: manual
+  stage: PromoteToProduction
+  environment:
+    name: production
+    url: https://cookbook.mimic.com.br
+  only:
+    refs:
+      - master

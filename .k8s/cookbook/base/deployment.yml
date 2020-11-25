@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cookbook
+  labels:
+    app: cookbook
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cookbook
+      tier: api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: cookbook
+        tier: api
+    spec:
+      initContainers:
+        - name: migrations
+          image: <DOCKER_TAG>
+          envFrom:
+            - configMapRef:
+                name: cookbook-configmap
+            - secretRef:
+                name: cookbook-secret
+          command: ["python", "manage.py", "migrate", "--noinput"]
+
+      containers:
+        - name: cookbook
+          image: <DOCKER_TAG>
+          command: [ "ddtrace-run", "gunicorn", "--bind", ":8090", "--workers", "3", "cookbook.wsgi" ]
+          env:
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/env']
+            - name: DD_SERVICE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/service']
+          envFrom:
+            - configMapRef:
+                name: cookbook-configmap
+            - secretRef:
+                name: cookbook-secret
+          ports:
+            - containerPort: 8090
+              name: http
+
+          resources:
+            requests:
+              memory: 1Gi
+              cpu: 1
+            limits:
+              memory: 1Gi
+              cpu: 1
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8090
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+          readinessProbe:
+            httpGet:
+              path: /health/
+              port: 8090
+            initialDelaySeconds: 5
+            periodSeconds: 30
+
+      imagePullSecrets:
+        - name: cookbook-registry-secret

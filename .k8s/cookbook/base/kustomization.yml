@@ -1,0 +1,9 @@
+resources:
+  - configmap.yml
+  - deployment.yml
+  - hpa.yml
+  - svc.yml
+commonLabels:
+  team: logistics
+  part-of: cookbook
+  tags.datadoghq.com/service: "cookbook"

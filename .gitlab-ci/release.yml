@@ -1,0 +1,27 @@
+release:
+  stage: Release
+  image: registry.gitlab.com/gitlab-org/release-cli
+  only:
+    refs:
+      - master
+  except:
+    - tags
+  before_script:
+    - apk add git
+  script:
+    - export DATE="$(date +'%Y-%m-%d_%H%M')"
+    - export NAME="${CI_BUILD_REF_NAME}-${DATE}"
+
+    - export LOG_FORMAT="%s (%aN)"
+    - export IMAGE_TAG="${CI_REGISTRY}/${CI_PROJECT_PATH}:${CI_BUILD_REF:0:8}"
+    - export DOCKER_IMAGE_STR="**Built image:&nbsp;${IMAGE_TAG}**  \n"
+    - export CHANGELOG="- $(git log --no-merges --format="${LOG_FORMAT}" ${CI_COMMIT_SHA}^..${CI_COMMIT_SHA} | sed '/^$/d' | sed ':a;N;$!ba;s/\n/\n- /g' | tr '"' "'" )"
+
+    - export DESCRIPTION=$(echo -e "${DOCKER_IMAGE_STR}${CHANGELOG}")
+
+    - >
+      release-cli create \
+        --name "${NAME}" \
+        --description "${DESCRIPTION}" \
+        --tag-name "release-${NAME}" \
+        --ref "${CI_COMMIT_SHA}"

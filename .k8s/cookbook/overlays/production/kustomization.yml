@@ -1,0 +1,7 @@
+bases:
+  - ../../base
+patchesStrategicMerge:
+  - configmap.yml
+commonLabels:
+  tags.datadoghq.com/env: "production"
+namespace: production

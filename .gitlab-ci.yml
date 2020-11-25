@@ -1,0 +1,17 @@
+image: opsmimic/ci:python3.8.5-slim
+
+stages:
+  - Testing
+  - CodeQuality
+  - IntegrationTesting
+  - Building
+  - Deploy
+  - PromoteToProduction
+  - Release
+
+include:
+  - local: .gitlab-ci/code-quality.yml
+  - local: .gitlab-ci/integration-testing.yml
+  - local: .gitlab-ci/build.yml
+  - local: .gitlab-ci/deploy.yml
+  - local: .gitlab-ci/release.yml

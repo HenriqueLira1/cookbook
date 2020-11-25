@@ -1,0 +1,7 @@
+resources:
+  - deployment.yml
+namePrefix: cookbook-
+commonLabels:
+  team: logistics
+  part-of: cookbook
+  tags.datadoghq.com/service: "cookbook-consumer"

@@ -1,0 +1,11 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: cookbook-configmap
+data:
+  # datadog: Features
+  LOGGING_JSON: "true"
+  DATADOG_TRACE_ENABLED: "true"
+  DD_PROFILING_ENABLED: "true"
+  DD_LOGS_INJECTION: "true"
+  DD_TRACE_ANALYTICS_ENABLED: "true"

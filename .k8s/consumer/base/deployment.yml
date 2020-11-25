@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consumer
+  labels:
+    app: consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consumer
+      tier: kafka-consumer
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: consumer
+        tier: kafka-consumer
+    spec:
+
+      containers:
+        - name: consumer
+          image: <DOCKER_TAG>
+          envFrom:
+            - configMapRef:
+                name: cookbook-configmap
+            - secretRef:
+                name: cookbook-secret
+          ports:
+            - containerPort: 6066
+              name: http
+          command: ["ddtrace-run", "faust", "-A", "consumer", "worker", "-l", "debug"]
+          env:
+            - name: DD_AGENT_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: DD_ENV
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/env']
+            - name: DD_SERVICE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['tags.datadoghq.com/service']
+
+          resources:
+            requests:
+              memory: 1Gi
+              cpu: 1
+            limits:
+              memory: 1Gi
+              cpu: 1
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 6066
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+      imagePullSecrets:
+        - name: cookbook-registry-secret

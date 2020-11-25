@@ -1,0 +1,73 @@
+.base_integration: &base_integration
+  stage: IntegrationTesting
+  services:
+    - postgres:12.3
+    - bitnami/zookeeper:latest
+    - bitnami/kafka:latest
+  tags:
+    - mimic-runner
+  variables:
+    PROJECT_DIR: src
+    # Django Database Settings
+    DB_HOST: localhost
+    DB_NAME: postgres
+    DB_USER: postgres
+    DB_PASSWORD: postgres
+    # Postgres Settings
+    POSTGRES_DB: postgres
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: postgres
+    # Zookeeper Settings
+    ALLOW_ANONYMOUS_LOGIN: "yes"
+    # Kafka Settings
+    KAFKA_USE_SSL: "False"
+    KAFKA_BROKER_ID: 1
+    KAFKA_LISTENERS: "PLAINTEXT://:9092"
+    KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://:9092"
+    KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+    ALLOW_PLAINTEXT_LISTENER: "yes"
+  before_script:
+    - pip install -r requirements-dev.txt
+  artifacts:
+    reports:
+      junit: report.xml
+
+.execute_pytest: &execute_pytest
+  - pytest "$PROJECT_DIR/tests/integration" --junitxml=report.xml
+
+.setup_vars: &setup_vars
+  - export DB_HOST=localhost DB_NAME=postgres DB_USER=postgres DB_PASSWORD=postgres DB_PORT=5432
+  - export KAFKA_BROKERS_URL=kafka_broker:9092 KAFKA_USE_SSL=False
+
+# .lint_migrations: &lint_migrations
+#   - python "$PROJECT_DIR/manage.py" lintmigrations
+
+integration-tests-develop:
+  <<: *base_integration
+  environment: development/integration
+  script:
+    - *setup_vars
+    # - *lint_migrations
+  only:
+    refs:
+      - merge_requests
+
+integration-tests-staging:
+  <<: *base_integration
+  environment: staging/integration
+  script:
+    - *setup_vars
+    # - *lint_migrations # Lint migrations again in case of a hotfix
+  only:
+    refs:
+      - master
+
+integration-tests-production:
+  <<: *base_integration
+  environment: production/integration
+  script:
+    - *setup_vars
+    - *execute_pytest # Intentionally don't lint migrations again
+  only:
+    refs:
+      - master

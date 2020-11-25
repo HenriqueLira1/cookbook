@@ -1,0 +1,65 @@
+linting:
+  stage: Testing
+  only:
+    refs:
+      - merge_requests
+      - master
+      - develop
+  tags:
+    - mimic-runner
+  variables:
+    PROJECT_DIR: src
+    BANDIT_CONFIG: bandit.yaml
+  before_script:
+    - pip install -r requirements-dev.txt
+  script:
+    - black --check "$PROJECT_DIR"
+    - isort --check "$PROJECT_DIR"
+    - flake8 "$PROJECT_DIR"
+    - bandit -r "$PROJECT_DIR" -c "$BANDIT_CONFIG"
+
+unit-tests:
+  stage: Testing
+  only:
+    refs:
+      - merge_requests
+      - master
+      - develop
+  tags:
+    - mimic-runner
+  variables:
+    PROJECT_DIR: src
+  before_script:
+    - pip install -r requirements-dev.txt
+  script:
+    - pytest "$PROJECT_DIR/tests/unit" --cov="$PWD" --cov-report=xml:cobertura.xml --junitxml=junit.xml
+  coverage: '/Total coverage: \d+\.\d+%/'
+  artifacts:
+    paths:
+      - junit.xml
+      - cobertura.xml
+    reports:
+      junit: junit.xml
+      cobertura: cobertura.xml
+
+sonarcloud-check:
+  stage: CodeQuality
+  image:
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
+    GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+  script:
+    - ls
+    - sonar-scanner
+  only:
+    refs:
+      - merge_requests
+      - master
+      - develop
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  allow_failure: true

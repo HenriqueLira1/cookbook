@@ -1,0 +1,59 @@
+version: "3"
+
+services:
+  cookbook_db:
+    image: postgres:12.3
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - cookbook_db_data:/var/lib/postgresql/data
+    networks:
+      - beeline-api_beeline_net
+
+  cookbook:
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+    image: mimic1/cookbook:local
+    container_name: cookbook
+    command: python src/manage.py runserver 0.0.0.0:8090
+    environment:
+      KAFKA_BROKERS_URL: kafka_broker:9092
+      KAFKA_USE_SSL: "False"
+    env_file:
+      - .env.dev
+    volumes:
+      - .:/app/
+    ports:
+      - "8090:8090"
+    networks:
+      - beeline-api_beeline_net
+    depends_on:
+      - cookbook_db
+
+  faust:
+    build:
+      context: .
+      dockerfile: dev.Dockerfile
+    image: mimic1/cookbook:local
+    restart: on-failure
+    working_dir: /app/src
+    command: faust -A consumer worker -l info
+    volumes:
+      - .:/app/
+    environment:
+      KAFKA_BROKERS_URL: kafka:9092
+      KAFKA_USE_SSL: "False"
+    env_file:
+      - .env.dev
+    networks:
+      - beeline-api_beeline_net
+
+volumes:
+  cookbook_db_data:
+
+networks:
+  beeline-api_beeline_net:
+    external: true
