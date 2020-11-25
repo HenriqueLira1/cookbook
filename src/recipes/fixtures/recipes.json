@@ -1,0 +1,50 @@
+[
+    {
+        "model": "recipes.recipe",
+        "pk": 1,
+        "fields": {
+            "title": "mixed eggs",
+            "cooking_time": "1 minute",
+            "image": "mixed.jpg",
+            "ingredients": [1, 2]
+        }
+    },
+    {
+        "model": "recipes.recipe",
+        "pk": 2,
+        "fields": {
+            "title": "boiled eggs",
+            "cooking_time": "2 minutes",
+            "image": "boiled.jpg",
+            "ingredients": [3, 4]
+        }
+    },
+    {
+        "model": "recipes.ingredient",
+        "pk": 1,
+        "fields": {
+            "name": "Eggs"
+        }
+    },
+    {
+        "model": "recipes.ingredient",
+        "pk": 2,
+        "fields": {
+            "name": "Milk"
+        }
+    },
+    {
+        "model": "recipes.ingredient",
+        "pk": 3,
+        "fields": {
+            "name": "Beef"
+        }
+    },
+    {
+        "model": "recipes.ingredient",
+        "pk": 4,
+        "fields": {
+            "name": "Chicken"
+        }
+    }
+]
