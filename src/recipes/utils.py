@@ -3,7 +3,7 @@ import time
 
 from .exceptions import Example
 
-logger = logging.getLogger("ingredients.utils")
+logger = logging.getLogger(__name__)
 
 TASK_NOT_FOUND_RETRY_CONFIG = {
     "times": 1,

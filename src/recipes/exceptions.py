@@ -1,6 +1,6 @@
 import logging
 
-logger = logging.getLogger("ingredients.exceptions")
+logger = logging.getLogger(__name__)
 
 
 class IngredientsException(Exception):

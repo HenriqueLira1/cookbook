@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     "health_check.db",
     "health_check.cache",
     "health_check.storage",
-    "ingredients",
     "recipes"
 ]
 

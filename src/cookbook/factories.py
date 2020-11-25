@@ -5,7 +5,7 @@ from django.conf import settings
 
 import kafka
 
-logger = logging.getLogger("cookbook.factories")
+logger = logging.getLogger(__name__)
 
 
 RETRIES = 50
