@@ -9,4 +9,3 @@ class Example:
     @property
     def success(self) -> bool:
         return self.exception is None
-

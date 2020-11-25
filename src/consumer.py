@@ -5,9 +5,7 @@ import faust
 from faust.sensors.datadog import DatadogMonitor
 
 os.environ.setdefault("FAUST_LOOP", "eventlet")
-os.environ.setdefault(
-    "DJANGO_SETTINGS_MODULE", "cookbook.settings.local"
-)
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cookbook.settings.local")
 
 app = faust.App(
     "cookbook",

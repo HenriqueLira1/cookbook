@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     "health_check.db",
     "health_check.cache",
     "health_check.storage",
-    "recipes"
+    "recipes",
 ]
 
 MIDDLEWARE = [
@@ -142,14 +142,25 @@ LOGGING = {
             "stream": "ext://sys.stdout",
             "formatter": "default",
         },
-        "json": {"class": "logging.StreamHandler", "formatter": "json", },
+        "json": {
+            "class": "logging.StreamHandler",
+            "formatter": "json",
+        },
     },
     "loggers": {
         # https://docs.djangoproject.com/en/3.0/topics/logging/#django-server
-        "django.server": {"level": "WARNING", },
-        "urllib3": {"level": "CRITICAL", },
-        "ddtrace": {"level": "WARNING", },
-        "asyncio": {"level": "WARNING", },
+        "django.server": {
+            "level": "WARNING",
+        },
+        "urllib3": {
+            "level": "CRITICAL",
+        },
+        "ddtrace": {
+            "level": "WARNING",
+        },
+        "asyncio": {
+            "level": "WARNING",
+        },
         "mode": {"level": "WARNING"},
         "aiokafka": {"level": "WARNING"},
     },
@@ -180,9 +191,15 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", },
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator", },
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator", },
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+    },
 ]
 
 
