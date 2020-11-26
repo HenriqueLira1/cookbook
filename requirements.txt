@@ -11,3 +11,4 @@ setproctitle==1.1.10
 python-json-logger==2.0.1
 faust[datadog,eventlet]==1.10.4
 graphene-django==2.13.0
+django-filter==2.4.0

@@ -45,8 +45,12 @@ INSTALLED_APPS = [
     "health_check.db",
     "health_check.cache",
     "health_check.storage",
+    "graphene_django",
+    "django_filters",
     "recipes",
 ]
+
+GRAPHENE = {"SCHEMA": "cookbook.schema.schema"}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

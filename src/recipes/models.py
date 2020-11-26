@@ -13,7 +13,7 @@ class Recipe(models.Model):
     cooking_time = models.CharField(max_length=100)
     image = models.CharField(max_length=255)
 
-    ingredients = models.ManyToManyField(Ingredient)
+    ingredients = models.ManyToManyField(Ingredient, related_name="recipes")
 
     def __str__(self):
         return self.title
