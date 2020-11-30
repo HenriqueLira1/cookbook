@@ -1,12 +1,15 @@
 from graphene import ObjectType, Schema
 
+from recipes.schema import Mutation as RecipesMutation
 from recipes.schema import Query as RecipesQuery
 
 
 class Query(RecipesQuery, ObjectType):
-    # This class will inherit from multiple Queries
-    # as more apps are added to the project
     pass
 
 
-schema = Schema(query=Query)
+class Mutation(RecipesMutation, ObjectType):
+    pass
+
+
+schema = Schema(query=Query, mutation=Mutation)
