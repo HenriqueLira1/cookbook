@@ -14,3 +14,4 @@ graphene-django==2.13.0
 django-filter==2.4.0
 channels==3.0.2
 graphene-subscriptions==1.0.2
+django-graphql-jwt==0.3.1

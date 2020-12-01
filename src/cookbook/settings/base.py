@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 import ast
 import os
+from datetime import timedelta
 from pathlib import Path
 
 from django.utils.log import DEFAULT_LOGGING
@@ -52,7 +53,19 @@ INSTALLED_APPS = [
     "recipes.apps.RecipesConfig",
 ]
 
-GRAPHENE = {"SCHEMA": "cookbook.schema.schema"}
+GRAPHENE = {
+    "SCHEMA": "cookbook.schema.schema",
+    "MIDDLEWARE": [
+        "graphql_jwt.middleware.JSONWebTokenMiddleware",
+    ],
+}
+
+GRAPHQL_JWT = {
+    "JWT_VERIFY_EXPIRATION": True,
+    "JWT_EXPIRATION_DELTA": timedelta(minutes=30),
+    "JWT_REFRESH_EXPIRATION_DELTA": timedelta(days=7),
+    "JWT_AUTH_HEADER_PREFIX": "Bearer",
+}
 
 CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 
@@ -64,6 +77,10 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+]
+
+AUTHENTICATION_BACKENDS = [
+    "graphql_jwt.backends.JSONWebTokenBackend",
 ]
 
 ROOT_URLCONF = "cookbook.urls"
