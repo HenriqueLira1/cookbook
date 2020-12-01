@@ -47,10 +47,14 @@ INSTALLED_APPS = [
     "health_check.storage",
     "graphene_django",
     "django_filters",
+    "channels",
+    "graphene_subscriptions",
     "recipes",
 ]
 
 GRAPHENE = {"SCHEMA": "cookbook.schema.schema"}
+
+CHANNEL_LAYERS = {"default": {"BACKEND": "channels.layers.InMemoryChannelLayer"}}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -81,6 +85,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "cookbook.wsgi.application"
+ASGI_APPLICATION = "cookbook.asgi.application"
 
 
 # Database
