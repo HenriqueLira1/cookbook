@@ -10,10 +10,13 @@ class IngredientQuery(graphene.ObjectType):
     ingredients = graphene.List(IngredientType)
     ingredient = graphene.Field(IngredientType, id=graphene.Int())
 
+    @login_required
     def resolve_ingredients(root, info):
         return Ingredient.objects.order_by("id")
 
+    @login_required
     def resolve_ingredient(root, info, id):
+        print(info.context.user)
         return Ingredient.objects.get(pk=id)
 
 

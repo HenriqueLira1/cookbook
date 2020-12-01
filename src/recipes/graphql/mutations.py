@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 
 import graphene
-from graphene_django.rest_framework.mutation import SerializerMutation
+from graphql_jwt.decorators import login_required
 
 from recipes.models import Ingredient, Recipe
 from recipes.serializers import IngredientSerializer, RecipeSerializer
@@ -9,16 +9,36 @@ from recipes.serializers import IngredientSerializer, RecipeSerializer
 from .types import IngredientType, RecipeType
 
 
-class CreateIngredientMutation(SerializerMutation):
-    class Meta:
-        serializer_class = IngredientSerializer
-        model_operations = ["create"]
+class IngredientInput(graphene.InputObjectType):
+    id = graphene.Int()
+    name = graphene.String()
 
 
-class UpdateIngredientMutation(SerializerMutation):
-    class Meta:
-        serializer_class = IngredientSerializer
-        model_operations = ["update"]
+class CreateIngredientMutation(graphene.Mutation):
+    class Arguments:
+        input = IngredientInput(required=True)
+
+    Output = IngredientType
+
+    @login_required
+    def mutate(root, info, input):
+        serializer = IngredientSerializer(data=input)
+        serializer.is_valid(raise_exception=True)
+        return serializer.save()
+
+
+class UpdateIngredientMutation(graphene.Mutation):
+    class Arguments:
+        input = IngredientInput(required=True)
+
+    Output = IngredientType
+
+    @login_required
+    def mutate(root, info, input):
+        instance = get_object_or_404(Recipe, pk=input.get("id"))
+        serializer = IngredientSerializer(instance, data=input, partial=True)
+        serializer.is_valid(raise_exception=True)
+        return serializer.save()
 
 
 class DeleteIngredientMutation(graphene.Mutation):
@@ -27,6 +47,7 @@ class DeleteIngredientMutation(graphene.Mutation):
 
     Output = IngredientType
 
+    @login_required
     def mutate(root, info, id):
         instance = get_object_or_404(Ingredient, pk=id)
         instance.delete()
@@ -48,6 +69,7 @@ class CreateRecipeMutation(graphene.Mutation):
 
     Output = RecipeType
 
+    @login_required
     def mutate(root, info, input):
         serializer = RecipeSerializer(data=input)
         serializer.is_valid(raise_exception=True)
@@ -60,6 +82,7 @@ class UpdateRecipeMutation(graphene.Mutation):
 
     Output = RecipeType
 
+    @login_required
     def mutate(root, info, input):
         instance = get_object_or_404(Recipe, pk=input.get("id"))
         serializer = RecipeSerializer(instance, data=input, partial=True)
@@ -73,6 +96,7 @@ class DeleteRecipeMutation(graphene.Mutation):
 
     Output = RecipeType
 
+    @login_required
     def mutate(root, info, id):
         instance = get_object_or_404(Recipe, pk=id)
         instance.delete()
