@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     "django_filters",
     "channels",
     "graphene_subscriptions",
-    "recipes",
+    "recipes.apps.RecipesConfig",
 ]
 
 GRAPHENE = {"SCHEMA": "cookbook.schema.schema"}
