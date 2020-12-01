@@ -50,7 +50,7 @@ docker-compose logs --follow faust
 
 We’re going to produce/consume the following Kafka topics:
 
-| Topic          | Propagation                                                       |  
+| Topic          | Propagation                                                       |
 | -------------- | ----------------------------------------------------------------- |
 | `SOME_TOPIC_1` | **Consume** Describe here the purpose of consume this topic...    |
 | `SOME_TOPIC_2` | **Produce** Describe here the purpose of produce to this topic... |
@@ -59,7 +59,8 @@ We’re going to produce/consume the following Kafka topics:
 
 You find the endpoints' method, url, and description in the table bellow.
 
-| Method | Endpoint URL                        | Description                                                                           |
-| ------ | ----------------------------------- | ------------------------------------------------------------------------------------- |
-| `GET`  | `health/`                           | [Application health check](https://github.com/KristianOellegaard/django-health-check) |
-| `POST` | `v1/ingredients/` | [Receive Onfleet webhook triggers](#/v1/ingredients/)               |
+| Method | Endpoint URL | Description                                                                           |
+| ------ | ------------ | ------------------------------------------------------------------------------------- |
+| `GET`  | `health/`    | [Application health check](https://github.com/KristianOellegaard/django-health-check) |
+| `POST` | `graphql/`   | [Receive grahpql queries mutations and subscriptions](#/graphql/)                     |
+| `GET`  | `graphql/`   | [GraphiQL interface](#/graphql/)                                                      |
