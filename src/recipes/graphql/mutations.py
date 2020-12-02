@@ -35,7 +35,7 @@ class UpdateIngredientMutation(graphene.Mutation):
 
     @login_required
     def mutate(root, info, input):
-        instance = get_object_or_404(Recipe, pk=input.get("id"))
+        instance = get_object_or_404(Ingredient, pk=input.get("id"))
         serializer = IngredientSerializer(instance, data=input, partial=True)
         serializer.is_valid(raise_exception=True)
         return serializer.save()
@@ -43,7 +43,7 @@ class UpdateIngredientMutation(graphene.Mutation):
 
 class DeleteIngredientMutation(graphene.Mutation):
     class Arguments:
-        id = graphene.Int(required=True)
+        id = graphene.ID(required=True)
 
     Output = IngredientType
 
@@ -92,7 +92,7 @@ class UpdateRecipeMutation(graphene.Mutation):
 
 class DeleteRecipeMutation(graphene.Mutation):
     class Arguments:
-        id = graphene.Int(required=True)
+        id = graphene.ID(required=True)
 
     Output = RecipeType
 
