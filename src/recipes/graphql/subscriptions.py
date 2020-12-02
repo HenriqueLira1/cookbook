@@ -9,8 +9,8 @@ from .types import IngredientType, RecipeType
 
 class IngredientSubscription(graphene.ObjectType):
     ingredient_created = graphene.Field(IngredientType)
-    ingredient_updated = graphene.Field(IngredientType, id=graphene.Int())
-    ingredient_deleted = graphene.Field(IngredientType, id=graphene.Int())
+    ingredient_updated = graphene.Field(IngredientType, id=graphene.ID())
+    ingredient_deleted = graphene.Field(IngredientType, id=graphene.ID())
 
     @login_required
     def resolve_ingredient_created(root, info):
@@ -38,8 +38,8 @@ class IngredientSubscription(graphene.ObjectType):
 
 class RecipeSubscription(graphene.ObjectType):
     recipe_created = graphene.Field(RecipeType)
-    recipe_updated = graphene.Field(RecipeType, id=graphene.Int())
-    recipe_deleted = graphene.Field(RecipeType, id=graphene.Int())
+    recipe_updated = graphene.Field(RecipeType, id=graphene.ID())
+    recipe_deleted = graphene.Field(RecipeType, id=graphene.ID())
 
     @login_required
     def resolve_recipe_created(root, info):

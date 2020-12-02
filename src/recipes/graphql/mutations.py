@@ -10,7 +10,7 @@ from .types import IngredientType, RecipeType
 
 
 class IngredientInput(graphene.InputObjectType):
-    id = graphene.Int()
+    id = graphene.ID()
     name = graphene.String()
 
 
@@ -56,7 +56,7 @@ class DeleteIngredientMutation(graphene.Mutation):
 
 
 class RecipeInput(graphene.InputObjectType):
-    id = graphene.Int()
+    id = graphene.ID()
     title = graphene.String()
     cooking_time = graphene.String()
     image = graphene.String()

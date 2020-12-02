@@ -8,7 +8,7 @@ from .types import IngredientType, RecipeType
 
 class IngredientQuery(graphene.ObjectType):
     ingredients = graphene.List(IngredientType)
-    ingredient = graphene.Field(IngredientType, id=graphene.Int())
+    ingredient = graphene.Field(IngredientType, id=graphene.ID())
 
     @login_required
     def resolve_ingredients(root, info):
@@ -16,13 +16,12 @@ class IngredientQuery(graphene.ObjectType):
 
     @login_required
     def resolve_ingredient(root, info, id):
-        print(info.context.user)
         return Ingredient.objects.get(pk=id)
 
 
 class RecipeQuery(graphene.ObjectType):
     recipes = graphene.List(RecipeType)
-    recipe = graphene.Field(RecipeType, id=graphene.Int())
+    recipe = graphene.Field(RecipeType, id=graphene.ID())
 
     @login_required
     def resolve_recipes(root, info):
