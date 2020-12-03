@@ -1,7 +1,9 @@
 import pytest
 import uuid
 
+from channels.testing import WebsocketCommunicator
 from graphene_django.utils.testing import graphql_query
+from graphene_subscriptions.consumers import GraphqlSubscriptionConsumer
 from graphql_jwt.settings import jwt_settings
 from graphql_jwt.shortcuts import get_token
 from pytest_factoryboy import register
@@ -38,5 +40,30 @@ def api_client_with_credentials(db, client, create_user):
             )
         }
         return graphql_query(*args, **kwargs, client=client, headers=headers)
+
+    return func
+
+
+@pytest.fixture
+async def websocket_communicator():
+    communicator = WebsocketCommunicator(
+        GraphqlSubscriptionConsumer.as_asgi(), "/graphql/"
+    )
+    connected, subprotocol = await communicator.connect()
+    assert connected
+    yield communicator
+    await communicator.disconnect()
+
+
+@pytest.fixture
+def execute_websocket_query(websocket_communicator):
+    async def func(query, variables=None):
+        await websocket_communicator.send_json_to(
+            {
+                "id": 1,
+                "type": "start",
+                "payload": {"query": query, "variables": variables},
+            }
+        )
 
     return func

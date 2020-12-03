@@ -1,6 +1,6 @@
 import graphene
 from graphene_subscriptions.events import CREATED, DELETED, UPDATED
-from graphql_jwt.decorators import login_required
+from rx import Observable
 
 from recipes.models import Ingredient, Recipe
 
@@ -12,14 +12,12 @@ class IngredientSubscription(graphene.ObjectType):
     ingredient_updated = graphene.Field(IngredientType, id=graphene.ID())
     ingredient_deleted = graphene.Field(IngredientType, id=graphene.ID())
 
-    @login_required
     def resolve_ingredient_created(root, info):
         return root.filter(
             lambda event: event.operation == CREATED
             and isinstance(event.instance, Ingredient)
         ).map(lambda event: event.instance)
 
-    @login_required
     def resolve_ingredient_updated(root, info, id):
         return root.filter(
             lambda event: event.operation == UPDATED
@@ -27,7 +25,6 @@ class IngredientSubscription(graphene.ObjectType):
             and event.instance.pk == id
         ).map(lambda event: event.instance)
 
-    @login_required
     def resolve_ingredient_deleted(root, info, id):
         return root.filter(
             lambda event: event.operation == DELETED
@@ -41,14 +38,12 @@ class RecipeSubscription(graphene.ObjectType):
     recipe_updated = graphene.Field(RecipeType, id=graphene.ID())
     recipe_deleted = graphene.Field(RecipeType, id=graphene.ID())
 
-    @login_required
     def resolve_recipe_created(root, info):
         return root.filter(
             lambda event: event.operation == CREATED
             and isinstance(event.instance, Recipe)
         ).map(lambda event: event.instance)
 
-    @login_required
     def resolve_recipe_updated(root, info, id):
         return root.filter(
             lambda event: event.operation == UPDATED
@@ -56,7 +51,6 @@ class RecipeSubscription(graphene.ObjectType):
             and event.instance.pk == id
         ).map(lambda event: event.instance)
 
-    @login_required
     def resolve_recipe_deleted(root, info, id):
         return root.filter(
             lambda event: event.operation == DELETED
@@ -66,4 +60,7 @@ class RecipeSubscription(graphene.ObjectType):
 
 
 class Subscription(IngredientSubscription, RecipeSubscription, graphene.ObjectType):
-    pass
+    hello = graphene.String()
+
+    def resolve_hello(root, info):
+        return Observable.of("hello world!")
