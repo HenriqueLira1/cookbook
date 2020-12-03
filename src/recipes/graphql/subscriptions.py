@@ -1,6 +1,5 @@
 import graphene
 from graphene_subscriptions.events import CREATED, DELETED, UPDATED
-from rx import Observable
 
 from recipes.models import Ingredient, Recipe
 
@@ -22,14 +21,14 @@ class IngredientSubscription(graphene.ObjectType):
         return root.filter(
             lambda event: event.operation == UPDATED
             and isinstance(event.instance, Ingredient)
-            and event.instance.pk == id
+            and event.instance.pk == int(id)
         ).map(lambda event: event.instance)
 
     def resolve_ingredient_deleted(root, info, id):
         return root.filter(
             lambda event: event.operation == DELETED
             and isinstance(event.instance, Ingredient)
-            and event.instance.pk == id
+            and event.instance.pk == int(id)
         ).map(lambda event: event.instance)
 
 
@@ -48,19 +47,16 @@ class RecipeSubscription(graphene.ObjectType):
         return root.filter(
             lambda event: event.operation == UPDATED
             and isinstance(event.instance, Recipe)
-            and event.instance.pk == id
+            and event.instance.pk == int(id)
         ).map(lambda event: event.instance)
 
     def resolve_recipe_deleted(root, info, id):
         return root.filter(
             lambda event: event.operation == DELETED
             and isinstance(event.instance, Recipe)
-            and event.instance.pk == id
+            and event.instance.pk == int(id)
         ).map(lambda event: event.instance)
 
 
 class Subscription(IngredientSubscription, RecipeSubscription, graphene.ObjectType):
-    hello = graphene.String()
-
-    def resolve_hello(root, info):
-        return Observable.of("hello world!")
+    pass

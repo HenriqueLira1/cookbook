@@ -1,9 +1,15 @@
 import pytest
 import uuid
 
+from django.db.models.signals import post_delete, post_save
+
 from channels.testing import WebsocketCommunicator
 from graphene_django.utils.testing import graphql_query
 from graphene_subscriptions.consumers import GraphqlSubscriptionConsumer
+from graphene_subscriptions.signals import (
+    post_delete_subscription,
+    post_save_subscription,
+)
 from graphql_jwt.settings import jwt_settings
 from graphql_jwt.shortcuts import get_token
 from pytest_factoryboy import register
@@ -64,6 +70,36 @@ def execute_websocket_query(websocket_communicator):
                 "type": "start",
                 "payload": {"query": query, "variables": variables},
             }
+        )
+
+    return func
+
+
+@pytest.fixture
+def connect_post_save_signal():
+    def func(sender_instance):
+        dispatch_uid = f"{sender_instance.__class__.__name__}_post_save"
+
+        yield post_save.connect(
+            post_save_subscription, sender=sender_instance, dispatch_uid=dispatch_uid
+        )
+        post_save.disconnect(
+            post_save_subscription, sender=sender_instance, dispatch_uid=dispatch_uid
+        )
+
+    return func
+
+
+@pytest.fixture
+def connect_post_delete_signal():
+    def func(sender_instance):
+        dispatch_uid = f"{sender_instance.__class__.__name__}_post_delete"
+
+        yield post_delete.connect(
+            post_delete_subscription, sender=sender_instance, dispatch_uid=dispatch_uid
+        )
+        post_delete.disconnect(
+            post_delete_subscription, sender=sender_instance, dispatch_uid=dispatch_uid
         )
 
     return func
