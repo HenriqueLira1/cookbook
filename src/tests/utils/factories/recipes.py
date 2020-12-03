@@ -18,6 +18,8 @@ class RecipeFactory(factory.django.DjangoModelFactory):
     cooking_time = factory.Sequence(lambda n: f"{n} minutes")
     image = factory.Sequence(lambda n: f"recipe_{n}.jpeg")
 
+
+class RecipeWithIngredientsFactory(RecipeFactory):
     @factory.post_generation
     def ingredients(self, create, extracted, **kwargs):
         if not create:

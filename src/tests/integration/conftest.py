@@ -14,10 +14,15 @@ from graphql_jwt.settings import jwt_settings
 from graphql_jwt.shortcuts import get_token
 from pytest_factoryboy import register
 
-from tests.utils.factories.recipes import IngredientFactory, RecipeFactory
+from tests.utils.factories.recipes import (
+    IngredientFactory,
+    RecipeFactory,
+    RecipeWithIngredientsFactory,
+)
 
 register(IngredientFactory)
 register(RecipeFactory)
+register(RecipeWithIngredientsFactory)
 
 
 @pytest.fixture

@@ -42,8 +42,8 @@ def test_ingredient_query(api_client_with_credentials, ingredient_factory):
     assert response_content["id"] == "1"
 
 
-def test_recipes_query(api_client_with_credentials, recipe_factory):
-    recipe_factory.create_batch(2)
+def test_recipes_query(api_client_with_credentials, recipe_with_ingredients_factory):
+    recipe_with_ingredients_factory.create_batch(2)
 
     response = api_client_with_credentials(
         """
@@ -68,9 +68,11 @@ def test_recipes_query(api_client_with_credentials, recipe_factory):
     assert len(response_content) == 2
 
 
-def test_recipe_query(api_client_with_credentials, ingredient_factory, recipe_factory):
+def test_recipe_query(
+    api_client_with_credentials, ingredient_factory, recipe_with_ingredients_factory
+):
     ingredients = ingredient_factory.create_batch(2)
-    recipe_factory.create(id=1, ingredients=ingredients)
+    recipe_with_ingredients_factory.create(id=1, ingredients=ingredients)
 
     response = api_client_with_credentials(
         """
