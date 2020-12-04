@@ -3,9 +3,9 @@ import uuid
 
 from django.db.models.signals import post_delete, post_save
 
+from asgiref.sync import sync_to_async
 from channels.testing import WebsocketCommunicator
 from graphene_django.utils.testing import graphql_query
-from graphene_subscriptions.consumers import GraphqlSubscriptionConsumer
 from graphene_subscriptions.signals import (
     post_delete_subscription,
     post_save_subscription,
@@ -14,6 +14,7 @@ from graphql_jwt.settings import jwt_settings
 from graphql_jwt.shortcuts import get_token
 from pytest_factoryboy import register
 
+from cookbook.asgi import websocket_application
 from tests.utils.factories.recipes import (
     IngredientFactory,
     RecipeFactory,
@@ -42,26 +43,44 @@ def create_user(db, django_user_model, test_password):
 
 
 @pytest.fixture
-def api_client_with_credentials(db, client, create_user):
-    def func(*args, **kwargs):
+def auth_headers(create_user):
+    user = create_user()
+    return {
+        jwt_settings.JWT_AUTH_HEADER_NAME: (
+            f"{jwt_settings.JWT_AUTH_HEADER_PREFIX} {get_token(user)}"
+        )
+    }
+
+
+@pytest.fixture
+def auth_headers_websocket(create_user):
+    def func():
         user = create_user()
-        headers = {
-            jwt_settings.JWT_AUTH_HEADER_NAME: (
-                f"{jwt_settings.JWT_AUTH_HEADER_PREFIX} {get_token(user)}"
-            )
-        }
-        return graphql_query(*args, **kwargs, client=client, headers=headers)
+        token = f"{jwt_settings.JWT_AUTH_HEADER_PREFIX} {get_token(user)}"
+
+        return [(b"authorization", bytes(token, "utf-8"))]
 
     return func
 
 
 @pytest.fixture
-async def websocket_communicator():
+def api_client_with_credentials(db, client, auth_headers):
+    def func(*args, **kwargs):
+        return graphql_query(*args, **kwargs, client=client, headers=auth_headers)
+
+    return func
+
+
+@pytest.fixture
+async def websocket_communicator(create_user, auth_headers_websocket):
+    headers = await sync_to_async(auth_headers_websocket)()
+
     communicator = WebsocketCommunicator(
-        GraphqlSubscriptionConsumer.as_asgi(), "/graphql/"
+        websocket_application, "/graphql/", headers=headers
     )
     connected, subprotocol = await communicator.connect()
     assert connected
+
     yield communicator
     await communicator.disconnect()
 
