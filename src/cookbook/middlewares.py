@@ -1,3 +1,6 @@
+import logging
+
+from django.contrib.auth.models import AnonymousUser
 from django.utils.translation import gettext as _
 
 from asgiref.sync import sync_to_async
@@ -7,11 +10,17 @@ from graphql_jwt import exceptions
 from graphql_jwt.settings import jwt_settings
 from graphql_jwt.shortcuts import get_user_by_token
 
+logger = logging.getLogger(__name__)
+
 
 class JSONWebTokenMiddleware(BaseMiddleware):
     async def __call__(self, scope, receive, send):
-        token = self._get_token(scope)
-        scope["user"] = await sync_to_async(self._get_user)(token)
+        try:
+            token = self._get_token(scope)
+            scope["user"] = await sync_to_async(self._get_user)(token)
+        except Exception as error:
+            logger.error(error, exc_info=True)
+            scope["user"] = AnonymousUser()
 
         return await self.inner(scope, receive, send)
 
