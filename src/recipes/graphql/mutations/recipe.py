@@ -1,6 +1,11 @@
 import graphene
 
 from recipes.serializers import RecipeSerializer
+from shared.constants import (
+    CREATE_MODEL_OPERATION,
+    DELETE_MODEL_OPERATION,
+    UPDATE_MODEL_OPERATION,
+)
 from shared.graphql import SerializerMutation
 
 from ..types import RecipeType
@@ -22,18 +27,18 @@ class BaseRecipeMutationMeta:
 
 class CreateRecipeMutation(SerializerMutation):
     class Meta(BaseRecipeMutationMeta):
-        model_operation = "create"
+        model_operation = CREATE_MODEL_OPERATION
 
 
 class UpdateRecipeMutation(SerializerMutation):
     class Meta(BaseRecipeMutationMeta):
-        model_operation = "update"
+        model_operation = UPDATE_MODEL_OPERATION
 
 
 class DeleteRecipeMutation(SerializerMutation):
     class Meta(BaseRecipeMutationMeta):
         arguments = {"id": graphene.ID(required=True)}
-        model_operation = "delete"
+        model_operation = DELETE_MODEL_OPERATION
 
 
 class RecipeMutations(graphene.ObjectType):

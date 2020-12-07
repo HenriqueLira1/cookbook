@@ -7,6 +7,11 @@ from graphene.types.mutation import MutationOptions
 from graphql_jwt.decorators import login_required
 
 from . import exceptions
+from .constants import (
+    CREATE_MODEL_OPERATION,
+    DELETE_MODEL_OPERATION,
+    UPDATE_MODEL_OPERATION,
+)
 
 
 class MutationOptions(MutationOptions):
@@ -57,9 +62,9 @@ class SerializerMutation(graphene.Mutation):
     @login_required
     def mutate(cls, root, info, **kwargs):
         perform_operation = {
-            "create": cls._preform_create,
-            "update": cls._preform_update,
-            "delete": cls._preform_delete,
+            CREATE_MODEL_OPERATION: cls._preform_create,
+            UPDATE_MODEL_OPERATION: cls._preform_update,
+            DELETE_MODEL_OPERATION: cls._preform_delete,
         }.get(cls._meta.model_operation)
 
         return perform_operation(**kwargs)
@@ -68,6 +73,7 @@ class SerializerMutation(graphene.Mutation):
     def _preform_create(cls, input):
         serializer = cls._meta.serializer_class(data=input)
         serializer.is_valid(raise_exception=True)
+
         return serializer.save()
 
     @classmethod
@@ -75,6 +81,7 @@ class SerializerMutation(graphene.Mutation):
         instance = get_object_or_404(cls._meta.model_class, pk=input.get("id"))
         serializer = cls._meta.serializer_class(instance, data=input, partial=True)
         serializer.is_valid(raise_exception=True)
+
         return serializer.save()
 
     @classmethod
