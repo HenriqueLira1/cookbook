@@ -1,7 +1,7 @@
 import graphene
 
 from recipes.serializers import RecipeSerializer
-from recipes.utils import SerializerMutation
+from shared.graphql import SerializerMutation
 
 from ..types import RecipeType
 
