@@ -6,6 +6,8 @@ import graphene
 from graphene.types.mutation import MutationOptions
 from graphql_jwt.decorators import login_required
 
+from . import exceptions
+
 
 class MutationOptions(MutationOptions):
     model_class = None  # type: models.Model
@@ -27,10 +29,14 @@ class SerializerMutation(graphene.Mutation):
             _meta = MutationOptions(cls)
 
         if not serializer_class:
-            raise Exception("serializer_class is required for the SerializerMutation")
+            raise exceptions.SerializerMutationMetaAttrException(
+                attribute="serializer_class"
+            )
 
         if not model_operation:
-            raise Exception("model_operation is required for the SerializerMutation")
+            raise exceptions.SerializerMutationMetaAttrException(
+                attribute="model_operation"
+            )
 
         if model_class is None:
             serializer_meta = getattr(serializer_class, "Meta", None)
@@ -38,8 +44,8 @@ class SerializerMutation(graphene.Mutation):
                 model_class = getattr(serializer_meta, "model", None)
 
         if not model_class and model_operation in ["update", "delete"]:
-            raise Exception(
-                "model_class is required for the update and delete operations"
+            raise exceptions.SerializerMutationMetaAttrException(
+                attribute="model_class"
             )
 
         _meta.model_class = model_class

@@ -11,27 +11,25 @@ class IngredientInput(graphene.InputObjectType):
     name = graphene.String()
 
 
+class BaseIngredientMutationMeta:
+    arguments = {"input": IngredientInput(required=True)}
+    output = IngredientType
+    serializer_class = IngredientSerializer
+
+
 class CreateIngredientMutation(SerializerMutation):
-    class Meta:
-        arguments = {"input": IngredientInput(required=True)}
-        output = IngredientType
-        serializer_class = IngredientSerializer
+    class Meta(BaseIngredientMutationMeta):
         model_operation = "create"
 
 
 class UpdateIngredientMutation(SerializerMutation):
-    class Meta:
-        arguments = {"input": IngredientInput(required=True)}
-        output = IngredientType
-        serializer_class = IngredientSerializer
+    class Meta(BaseIngredientMutationMeta):
         model_operation = "update"
 
 
 class DeleteIngredientMutation(SerializerMutation):
-    class Meta:
+    class Meta(BaseIngredientMutationMeta):
         arguments = {"id": graphene.ID(required=True)}
-        output = IngredientType
-        serializer_class = IngredientSerializer
         model_operation = "delete"
 
 

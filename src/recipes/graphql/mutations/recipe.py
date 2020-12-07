@@ -14,27 +14,25 @@ class RecipeInput(graphene.InputObjectType):
     ingredients = graphene.List(graphene.Int)
 
 
+class BaseRecipeMutationMeta:
+    arguments = {"input": RecipeInput(required=True)}
+    output = RecipeType
+    serializer_class = RecipeSerializer
+
+
 class CreateRecipeMutation(SerializerMutation):
-    class Meta:
-        arguments = {"input": RecipeInput(required=True)}
-        output = RecipeType
-        serializer_class = RecipeSerializer
+    class Meta(BaseRecipeMutationMeta):
         model_operation = "create"
 
 
 class UpdateRecipeMutation(SerializerMutation):
-    class Meta:
-        arguments = {"input": RecipeInput(required=True)}
-        output = RecipeType
-        serializer_class = RecipeSerializer
+    class Meta(BaseRecipeMutationMeta):
         model_operation = "update"
 
 
 class DeleteRecipeMutation(SerializerMutation):
-    class Meta:
+    class Meta(BaseRecipeMutationMeta):
         arguments = {"id": graphene.ID(required=True)}
-        output = RecipeType
-        serializer_class = RecipeSerializer
         model_operation = "delete"
 
 
