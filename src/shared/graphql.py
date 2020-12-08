@@ -3,8 +3,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 
 import graphene
+import graphql_jwt
 from graphene.types.mutation import MutationOptions
-from graphql_jwt.decorators import login_required
 
 from . import exceptions
 from .constants import (
@@ -21,12 +21,18 @@ class MutationOptions(MutationOptions):
 
 
 class SerializerMutation(graphene.Mutation):
+    """
+    Inherit from this class to perform simple CRUD Mutations
+    based on DRF Serializers
+    """
+
     @classmethod
     def __init_subclass_with_meta__(
         cls,
         model_class=None,
         serializer_class=None,
         model_operation=None,
+        login_required=True,
         _meta=None,
         **options
     ):
@@ -56,11 +62,14 @@ class SerializerMutation(graphene.Mutation):
         _meta.model_class = model_class
         _meta.serializer_class = serializer_class
         _meta.model_operation = model_operation
+        _meta.login_required = login_required
         super().__init_subclass_with_meta__(_meta=_meta, **options)
 
     @classmethod
-    @login_required
     def mutate(cls, root, info, **kwargs):
+        # Validate JWT Auth
+        cls._validate_auth(info)
+
         perform_operation = {
             CREATE_MODEL_OPERATION: cls._preform_create,
             UPDATE_MODEL_OPERATION: cls._preform_update,
@@ -90,3 +99,10 @@ class SerializerMutation(graphene.Mutation):
         instance.delete()
 
         return instance
+
+    @classmethod
+    def _validate_auth(cls, info):
+        if cls._meta.login_required:
+            user = info.context.user
+            if not user.is_authenticated:
+                raise graphql_jwt.exceptions.PermissionDenied()
