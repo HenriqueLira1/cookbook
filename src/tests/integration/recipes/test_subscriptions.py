@@ -171,10 +171,10 @@ async def test_recipe_updated_subscription(
 async def test_recipe_deleted_subscription(
     websocket_communicator,
     execute_websocket_query,
-    connect_post_save_signal,
+    connect_post_delete_signal,
     recipe_factory,
 ):
-    connect_post_save_signal(Recipe)
+    connect_post_delete_signal(Recipe)
 
     recipe = await sync_to_async(recipe_factory.create)()
 

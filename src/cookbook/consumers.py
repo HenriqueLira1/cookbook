@@ -45,7 +45,9 @@ class SubscriptionConsumer(GraphqlSubscriptionConsumer):
             if token_name != jwt_settings.JWT_AUTH_HEADER_PREFIX:
                 raise exceptions.JSONWebTokenError(_("Invalid token prefix"))
 
-        except (ValueError, KeyError) as error:
+        except KeyError as error:
+            raise exceptions.JSONWebTokenError(_("Token not provided")) from error
+        except ValueError as error:
             raise exceptions.JSONWebTokenError(
                 _("Token prefix not provided")
             ) from error

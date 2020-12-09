@@ -53,17 +53,6 @@ def auth_headers(create_user):
 
 
 @pytest.fixture
-def auth_headers_websocket(create_user):
-    def func():
-        user = create_user()
-        token = f"{jwt_settings.JWT_AUTH_HEADER_PREFIX} {get_token(user)}"
-
-        return [(b"authorization", bytes(token, "utf-8"))]
-
-    return func
-
-
-@pytest.fixture
 def api_client_with_credentials(db, client, auth_headers):
     def func(*args, **kwargs):
         return graphql_query(*args, **kwargs, client=client, headers=auth_headers)
@@ -72,12 +61,19 @@ def api_client_with_credentials(db, client, auth_headers):
 
 
 @pytest.fixture
-async def websocket_communicator(create_user, auth_headers_websocket):
-    headers = await sync_to_async(auth_headers_websocket)()
+def auth_token(create_user):
+    def func():
+        user = create_user()
+        token = f"{jwt_settings.JWT_AUTH_HEADER_PREFIX} {get_token(user)}"
 
-    communicator = WebsocketCommunicator(
-        websocket_application, "/graphql/", headers=headers
-    )
+        return token
+
+    return func
+
+
+@pytest.fixture
+async def websocket_communicator():
+    communicator = WebsocketCommunicator(websocket_application, "/graphql/")
     connected, subprotocol = await communicator.connect()
     assert connected
 
@@ -86,8 +82,18 @@ async def websocket_communicator(create_user, auth_headers_websocket):
 
 
 @pytest.fixture
-def execute_websocket_query(websocket_communicator):
+def execute_websocket_query(websocket_communicator, auth_token):
     async def func(query, variables=None):
+        token = await sync_to_async(auth_token)()
+
+        await websocket_communicator.send_json_to(
+            {
+                "id": 1,
+                "type": "connection_init",
+                "payload": {"headers": {"authorization": token}},
+            }
+        )
+
         await websocket_communicator.send_json_to(
             {
                 "id": 1,
@@ -104,10 +110,7 @@ def connect_post_save_signal():
     def func(sender_instance):
         dispatch_uid = f"{sender_instance.__class__.__name__}_post_save"
 
-        yield post_save.connect(
-            post_save_subscription, sender=sender_instance, dispatch_uid=dispatch_uid
-        )
-        post_save.disconnect(
+        return post_save.connect(
             post_save_subscription, sender=sender_instance, dispatch_uid=dispatch_uid
         )
 
@@ -119,10 +122,7 @@ def connect_post_delete_signal():
     def func(sender_instance):
         dispatch_uid = f"{sender_instance.__class__.__name__}_post_delete"
 
-        yield post_delete.connect(
-            post_delete_subscription, sender=sender_instance, dispatch_uid=dispatch_uid
-        )
-        post_delete.disconnect(
+        return post_delete.connect(
             post_delete_subscription, sender=sender_instance, dispatch_uid=dispatch_uid
         )
 

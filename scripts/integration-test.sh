@@ -5,6 +5,7 @@ set -e
 LOCAL="docker-compose run cookbook"
 COMMAND="pytest"
 ARGS="./src/tests/integration"
+# ARGS="./src/tests/integration/recipes/test_subscriptions.py::test_recipe_deleted_subscription"
 
 while (( "$#" ))
 do
