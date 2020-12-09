@@ -1,5 +1,5 @@
 from django.urls import path
 
-from graphene_subscriptions.consumers import GraphqlSubscriptionConsumer
+from .consumers import SubscriptionConsumer
 
-websocket_urlpatterns = [path("graphql/", GraphqlSubscriptionConsumer.as_asgi())]
+websocket_urlpatterns = [path("graphql/", SubscriptionConsumer.as_asgi())]
